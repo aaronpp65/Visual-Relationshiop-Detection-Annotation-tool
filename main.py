@@ -62,6 +62,8 @@ def img(frame,window,ann_pairs,anns,j,df):
     resized_image = cv2.resize(frame_copy, (650,450))
     imgbytes = cv2.imencode('.png', resized_image)[1].tobytes()
     return imgbytes
+
+
 def write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j):
         predicate = response["Answer"]
         if(predicate):
@@ -72,6 +74,27 @@ def write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j):
                 df.to_csv(vrd_filename+"/"+img_files[i-1][:-4]+".csv", index=False)
             except:
                 writer.writerow([anns[ann_pairs[j-1][0]],ann_pairs[j-1][0], predicate, anns[ann_pairs[j-1][1]], ann_pairs[j-1][1]])
+
+def ann_pairs_list(ann_pairs,anns,df,window):
+    ann_pairs_list=[]
+    for ann_pair in ann_pairs:
+        label1 = df[(df["label1"] == anns[ann_pair[0]]) ]
+        label2 = label1.loc[label1["label2"] ==anns[ann_pair[1]], "predicate"]
+        try:
+            ann_pairs_list.append(anns[ann_pair[0]]+"   "+label2.values[0]+"    "+anns[ann_pair[1]])
+        except:
+            ann_pairs_list.append(anns[ann_pair[0]]+"   nil   "+anns[ann_pair[1]])
+        
+        window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
+
+def update_predicate(df,anns,ann_pairs,window,j):
+    label1 = df[(df["label1"] == anns[ann_pairs[j][0]]) ]
+    label2 = label1.loc[label1["label2"] ==anns[ann_pairs[j][1]], "predicate"]
+    try:
+        window['-predicate-'].update(label2.values[0])
+    except:
+        window['-predicate-'].update("nil")
+
 def main():
 
     filename = sg.popup_get_folder('Filename with Imgs and Anns')
@@ -82,9 +105,7 @@ def main():
     vrd_filename = filename+'/vrd'
     
     img_files = os.listdir(imgs_filename)
-    # vidFile = cv2.VideoCapture(imgs_filename+"/"+img_files[0])
-    # bboxs = get_annotation(anns_filename+"/"+img_files[0][:-4]+".xml")
-    # print(bboxs)
+
     block_4 = [[sg.Text('Images', font='Any 20')],
             [sg.Listbox(img_files, size=(20, 30),default_values=[img_files[0],], bind_return_key=True, key='-LISTBOX-')]]
     block_5 = [[sg.Text('Ann Pairs', font='Any 20')],
@@ -94,11 +115,9 @@ def main():
                 [ nextAnnBtn()],[ nextBtn()]]),
                     sg.Column(block_4),sg.Column(block_5)]]
     window = sg.Window('VRD Application ', layout, location=(800, 400),resizable=True)
-    # ret, frame = vidFile.read()
-    # imgbytes = cv2.imencode('.png', frame)[1].tobytes()
+
     i=0
     while window(timeout=20)[0] is not None:
-        predicate = ""
         response = {}
         event, response = window.Read()
         print(event)
@@ -110,6 +129,7 @@ def main():
 
             vidFile = cv2.VideoCapture(imgs_filename+"/"+img_files[i])
             anns = get_annotation(anns_filename+"/"+img_files[i][:-4]+".xml")
+            
             if(os.path.isfile(vrd_filename+"/"+img_files[i][:-4]+".csv")) :
                 file = open(vrd_filename+"/"+img_files[i][:-4]+".csv", 'a')
                 writer = csv.writer(file)
@@ -127,42 +147,36 @@ def main():
             ret, frame = vidFile.read()
 
             ann_pairs = (list(itertools.combinations(anns.keys(), 2)))
-            ann_pairs_list=[]
-            for ann_pair in ann_pairs:
-                label1 = df[(df["label1"] == anns[ann_pair[0]]) ]
-                label2 = label1.loc[label1["label2"] ==anns[ann_pair[1]], "predicate"]
-                try:
-                    ann_pairs_list.append(anns[ann_pair[0]]+"   "+label2.values[0]+"    "+anns[ann_pair[1]])
-                except:
-                    ann_pairs_list.append(anns[ann_pair[0]]+"   nil   "+anns[ann_pair[1]])
+            ann_pairs_list(ann_pairs,anns,df,window)
+            # for ann_pair in ann_pairs:
+            #     label1 = df[(df["label1"] == anns[ann_pair[0]]) ]
+            #     label2 = label1.loc[label1["label2"] ==anns[ann_pair[1]], "predicate"]
+            #     try:
+            #         ann_pairs_list.append(anns[ann_pair[0]]+"   "+label2.values[0]+"    "+anns[ann_pair[1]])
+            #     except:
+            #         ann_pairs_list.append(anns[ann_pair[0]]+"   nil   "+anns[ann_pair[1]])
 
-            window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
+            # window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
 
-            # frame_copy = frame.copy()
-            # x1,y1,x2,y2 = json.loads(ann_pairs[j][0])
-            # window['-label1-'].update(anns[ann_pairs[j][0]])
-            # cv2.rectangle(frame_copy, (x1, y1),(x2, y2), (255,0,0), 2)
-            # x1,y1,x2,y2 = json.loads(ann_pairs[j][1])
-            # window['-label2-'].update(anns[ann_pairs[j][1]])
-            # cv2.rectangle(frame_copy, (x1, y1),(x2, y2), (255,0,0), 2)
             imgbytes = img(frame,window,ann_pairs,anns,j,df)
 
-            label1 = df[(df["label1"] == anns[ann_pairs[j][0]]) ]
-            label2 = label1.loc[label1["label2"] ==anns[ann_pairs[j][1]], "predicate"]
-            try:
-                window['-predicate-'].update(label2.values[0])
-            except:
-                window['-predicate-'].update("nil")
+            # label1 = df[(df["label1"] == anns[ann_pairs[j][0]]) ]
+            # label2 = label1.loc[label1["label2"] ==anns[ann_pairs[j][1]], "predicate"]
+            # try:
+            #     window['-predicate-'].update(label2.values[0])
+            # except:
+            #     window['-predicate-'].update("nil")
+            update_predicate(df,anns,ann_pairs,window,j)
             j+=1
-            # resized_image = cv2.resize(frame_copy, (650,450))
-            # imgbytes = cv2.imencode('.png', resized_image)[1].tobytes()
 
 
         if event == "Next Image" and i!=len(img_files):
             j=0
             window.Element('-LISTBOX-').Update(set_to_index=i) 
+
             vidFile = cv2.VideoCapture(imgs_filename+"/"+img_files[i])
             anns = get_annotation(anns_filename+"/"+img_files[i][:-4]+".xml")
+
             if(os.path.isfile(vrd_filename+"/"+img_files[i][:-4]+".csv")) :
                 file = open(vrd_filename+"/"+img_files[i][:-4]+".csv", 'a')
                 writer = csv.writer(file)
@@ -180,33 +194,25 @@ def main():
             ret, frame = vidFile.read()
 
             ann_pairs = (list(itertools.combinations(anns.keys(), 2)))
-            ann_pairs_list=[]
-            for ann_pair in ann_pairs:
-                label1 = df[(df["label1"] == anns[ann_pair[0]]) ]
-                label2 = label1.loc[label1["label2"] ==anns[ann_pair[1]], "predicate"]
-                try:
-                    ann_pairs_list.append(anns[ann_pair[0]]+"   "+label2.values[0]+"    "+anns[ann_pair[1]])
-                except:
-                    ann_pairs_list.append(anns[ann_pair[0]]+"   nil   "+anns[ann_pair[1]])
+            ann_pairs_list(ann_pairs,anns,df,window)
+            # for ann_pair in ann_pairs:
+            #     label1 = df[(df["label1"] == anns[ann_pair[0]]) ]
+            #     label2 = label1.loc[label1["label2"] ==anns[ann_pair[1]], "predicate"]
+            #     try:
+            #         ann_pairs_list.append(anns[ann_pair[0]]+"   "+label2.values[0]+"    "+anns[ann_pair[1]])
+            #     except:
+            #         ann_pairs_list.append(anns[ann_pair[0]]+"   nil   "+anns[ann_pair[1]])
 
-            window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
+            # window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
 
-            # frame_copy = frame.copy()
-            # x1,y1,x2,y2 = json.loads(ann_pairs[j][0])
-            # window['-label1-'].update(anns[ann_pairs[j][0]])
-            # cv2.rectangle(frame_copy, (x1, y1),(x2, y2), (255,0,0), 2)
-            # x1,y1,x2,y2 = json.loads(ann_pairs[j][1])
-            # window['-label2-'].update(anns[ann_pairs[j][1]])
-            # cv2.rectangle(frame_copy, (x1, y1),(x2, y2), (255,0,0), 2)
+            # label1 = df[(df["label1"] == anns[ann_pairs[j][0]]) ]
+            # label2 = label1.loc[label1["label2"] ==anns[ann_pairs[j][1]], "predicate"]
+            # try:
+            #     window['-predicate-'].update(label2.values[0])
+            # except:
+            #     window['-predicate-'].update("nil")
+            update_predicate(df,anns,ann_pairs,window,j)
 
-            label1 = df[(df["label1"] == anns[ann_pairs[j][0]]) ]
-            label2 = label1.loc[label1["label2"] ==anns[ann_pairs[j][1]], "predicate"]
-            try:
-                window['-predicate-'].update(label2.values[0])
-            except:
-                window['-predicate-'].update("nil")
-            # resized_image = cv2.resize(frame_copy, (650,450))
-            # imgbytes = cv2.imencode('.png', resized_image)[1].tobytes()
             imgbytes = img(frame,window,ann_pairs,anns,j,df)
             j+=1
 
@@ -217,12 +223,13 @@ def main():
             imgbytes = img(frame,window,ann_pairs,anns,j,df)
 
 
-            label1 = df[(df["label1"] == anns[ann_pairs[j][0]]) ]
-            label2 = label1.loc[label1["label2"] ==anns[ann_pairs[j][1]], "predicate"]
-            try:
-                window['-predicate-'].update(label2.values[0])
-            except:
-                window['-predicate-'].update("nil")
+            # label1 = df[(df["label1"] == anns[ann_pairs[j][0]]) ]
+            # label2 = label1.loc[label1["label2"] ==anns[ann_pairs[j][1]], "predicate"]
+            # try:
+            #     window['-predicate-'].update(label2.values[0])
+            # except:
+            #     window['-predicate-'].update("nil")
+            update_predicate(df,anns,ann_pairs,window,j)
             
             write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j)
             j+=1
@@ -231,49 +238,22 @@ def main():
         if(event=="Next Ann") and j!=len(ann_pairs):
             window.Element('-LISTBOXAnn-').Update(set_to_index=j) 
 
-            # frame_copy = frame.copy()
-            # x1,y1,x2,y2 = json.loads(ann_pairs[j][0])
-            # window['-label1-'].update(anns[ann_pairs[j][0]])
-            # cv2.rectangle(frame_copy, (x1, y1),(x2, y2), (255,0,0), 2)
 
-            # x1,y1,x2,y2 = json.loads(ann_pairs[j][1])
-            # window['-label2-'].update(anns[ann_pairs[j][1]])
-            # cv2.rectangle(frame_copy, (x1, y1),(x2, y2), (255,0,0), 2)
-            # resized_image = cv2.resize(frame_copy, (650,450))
-            # imgbytes = cv2.imencode('.png', resized_image)[1].tobytes()
             imgbytes = img(frame,window,ann_pairs,anns,j,df)
 
 
-            label1 = df[(df["label1"] == anns[ann_pairs[j][0]]) ]
-            label2 = label1.loc[label1["label2"] ==anns[ann_pairs[j][1]], "predicate"]
-            try:
-                window['-predicate-'].update(label2.values[0])
-            except:
-                window['-predicate-'].update("nil")
+            # label1 = df[(df["label1"] == anns[ann_pairs[j][0]]) ]
+            # label2 = label1.loc[label1["label2"] ==anns[ann_pairs[j][1]], "predicate"]
+            # try:
+            #     window['-predicate-'].update(label2.values[0])
+            # except:
+            #     window['-predicate-'].update("nil")
+            update_predicate(df,anns,ann_pairs,window,j)
 
-            
-            # predicate = response["Answer"]
-            # if(predicate):
-            #     label1 = df[(df["label1"] == anns[ann_pairs[j-1][0]]) ]
-            #     label2 = label1.loc[label1["label2"] ==anns[ann_pairs[j-1][1]], "predicate"]
-            #     try:
-            #         df.loc[label2.index[0],'predicate']=predicate
-            #         df.to_csv(vrd_filename+"/"+img_files[i-1][:-4]+".csv", index=False)
-            #     except:
-            #         writer.writerow([anns[ann_pairs[j-1][0]],ann_pairs[j-1][0], predicate, anns[ann_pairs[j-1][1]], ann_pairs[j-1][1]])
             write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j)
             j+=1
             
         if(j==len(ann_pairs)):
-            # predicate = response["Answer"]
-            # if(predicate):
-            #     label1 = df[(df["label1"] == anns[ann_pairs[j-1][0]]) ]
-            #     label2 = label1.loc[label1["label2"] ==anns[ann_pairs[j-1][1]], "predicate"]
-            #     try:
-            #         df.loc[label2.index[0],'predicate']=predicate
-            #         df.to_csv(vrd_filename+"/"+img_files[i-1][:-4]+".csv", index=False)
-            #     except:
-            #         writer.writerow([anns[ann_pairs[j-1][0]],ann_pairs[j-1][0], predicate, anns[ann_pairs[j-1][1]], ann_pairs[j-1][1]])
             write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j)
             j=0
 
