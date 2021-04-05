@@ -12,6 +12,7 @@ import os
 import json
 import itertools
 
+
 def nextBtn():
     return sg.Button("Next Image")
 
@@ -75,7 +76,7 @@ def write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j):
             except:
                 writer.writerow([anns[ann_pairs[j-1][0]],ann_pairs[j-1][0], predicate, anns[ann_pairs[j-1][1]], ann_pairs[j-1][1]])
 
-def ann_pairs_list(ann_pairs,anns,df,window):
+def get_list(ann_pairs,anns,df,window):
     ann_pairs_list=[]
     for ann_pair in ann_pairs:
         label1 = df[(df["label1"] == anns[ann_pair[0]]) ]
@@ -84,8 +85,8 @@ def ann_pairs_list(ann_pairs,anns,df,window):
             ann_pairs_list.append(anns[ann_pair[0]]+"   "+label2.values[0]+"    "+anns[ann_pair[1]])
         except:
             ann_pairs_list.append(anns[ann_pair[0]]+"   nil   "+anns[ann_pair[1]])
+    return ann_pairs_list
         
-        window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
 
 def update_predicate(df,anns,ann_pairs,window,j):
     label1 = df[(df["label1"] == anns[ann_pairs[j][0]]) ]
@@ -106,14 +107,18 @@ def main():
     
     img_files = os.listdir(imgs_filename)
 
-    block_4 = [[sg.Text('Images', font='Any 20')],
+
+    block_1 = [[sg.Image(filename='', key='image')], [sg.Text(size=(10,1), key='-label1-'),sg.Text(size=(10,1), key='-predicate-'),sg.Text(size=(10,1), key='-label2-')],[sg.InputText(key="Answer", do_not_clear=False)],
+                [ nextAnnBtn()],[ nextBtn()]]
+                
+    block_2 = [[sg.Text('Images', font='Any 20')],
             [sg.Listbox(img_files, size=(20, 30),default_values=[img_files[0],], bind_return_key=True, key='-LISTBOX-')]]
-    block_5 = [[sg.Text('Ann Pairs', font='Any 20')],
+
+    block_3 = [[sg.Text('Ann Pairs', font='Any 20')],
             [sg.Listbox([], size=(30, 30), bind_return_key=True, key='-LISTBOXAnn-')]]
-    layout = [
-        [sg.Column([[sg.Image(filename='', key='image')], [sg.Text(size=(10,1), key='-label1-'),sg.Text(size=(10,1), key='-predicate-'),sg.Text(size=(10,1), key='-label2-')],[sg.InputText(key="Answer", do_not_clear=False)],
-                [ nextAnnBtn()],[ nextBtn()]]),
-                    sg.Column(block_4),sg.Column(block_5)]]
+
+    layout = [[sg.Column(block_1),sg.Column(block_2),sg.Column(block_3)]]
+
     window = sg.Window('VRD Application ', layout, location=(800, 400),resizable=True)
 
     i=0
@@ -147,7 +152,10 @@ def main():
             ret, frame = vidFile.read()
 
             ann_pairs = (list(itertools.combinations(anns.keys(), 2)))
-            ann_pairs_list(ann_pairs,anns,df,window)
+            ann_pairs_list=[]
+            ann_pairs_list=get_list(ann_pairs,anns,df,window)
+            window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
+
             # for ann_pair in ann_pairs:
             #     label1 = df[(df["label1"] == anns[ann_pair[0]]) ]
             #     label2 = label1.loc[label1["label2"] ==anns[ann_pair[1]], "predicate"]
@@ -173,6 +181,7 @@ def main():
         if event == "Next Image" and i!=len(img_files):
             j=0
             window.Element('-LISTBOX-').Update(set_to_index=i) 
+            window.Element('-LISTBOXAnn-').Update(set_to_index=1) 
 
             vidFile = cv2.VideoCapture(imgs_filename+"/"+img_files[i])
             anns = get_annotation(anns_filename+"/"+img_files[i][:-4]+".xml")
@@ -194,7 +203,10 @@ def main():
             ret, frame = vidFile.read()
 
             ann_pairs = (list(itertools.combinations(anns.keys(), 2)))
-            ann_pairs_list(ann_pairs,anns,df,window)
+            ann_pairs_list=[]
+            ann_pairs_list=get_list(ann_pairs,anns,df,window)
+            window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
+
             # for ann_pair in ann_pairs:
             #     label1 = df[(df["label1"] == anns[ann_pair[0]]) ]
             #     label2 = label1.loc[label1["label2"] ==anns[ann_pair[1]], "predicate"]
