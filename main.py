@@ -16,6 +16,9 @@ import itertools
 def nextBtn():
     return sg.Button("Next Image")
 
+def submitBtn():
+    return sg.Button("Submit")
+
 
 def prevBtn():
     return sg.Button("Previous")
@@ -66,7 +69,7 @@ def img(frame,window,ann_pairs,anns,j,df):
 
 
 def write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j):
-        predicate = response["Answer"]
+        predicate = response["-predicateList-"]
         if(predicate):
             subject = df[(df["subject"] == anns[ann_pairs[j-1][0]]) ]
             object = subject.loc[subject["object"] ==anns[ann_pairs[j-1][1]], "predicate"]
@@ -107,9 +110,14 @@ def main():
     
     img_files = os.listdir(imgs_filename)
 
+    predicatesfile = open("/home/phi/code/Neuroplex/vrd_gui/predicates.txt", 'r')
+    predicates_list = [line.rstrip() for line in predicatesfile.readlines()]
+    predicates_list=list(set(predicates_list))
+    predicates_list.sort()
 
-    block_1 = [[sg.Image(filename='', key='image')], [sg.Text(size=(10,1), key='-subject-'),sg.Text(size=(10,1), key='-predicate-'),sg.Text(size=(10,1), key='-object-')],[sg.InputText(key="Answer", do_not_clear=False)],
-                [ nextAnnBtn()],[ nextBtn()]]
+
+    block_1 = [[sg.Image(filename='', key='image')], [sg.Text(size=(10,1), key='-subject-'),sg.Text(size=(10,1), key='-predicate-'),sg.Text(size=(10,1), key='-object-')],
+                [sg.Text('Predicate :'), sg.Combo(predicates_list, size=(12,20), key='-predicateList-')],[ nextAnnBtn()],[ nextBtn()]]
 
     block_2 = [[sg.Text('Images', font='Any 20')],
             [sg.Listbox(img_files, size=(20, 30),default_values=[img_files[0],], bind_return_key=True, key='-LISTBOXImg-')]]
@@ -129,6 +137,7 @@ def main():
 
 
         if event =="-LISTBOXImg-":
+            window.Element('-predicateList-').update(value='', values=predicates_list)
             i= img_files.index(response["-LISTBOXImg-"][0])
             j=0
 
@@ -165,7 +174,8 @@ def main():
         if event == "Next Image" and i!=len(img_files):
             j=0
             window.Element('-LISTBOXImg-').Update(set_to_index=i) 
-            window.Element('-LISTBOXAnn-').Update(set_to_index=0) 
+            # window.Element('-LISTBOXAnn-').Update(set_to_index=0) 
+            window.Element('-predicateList-').update(value='', values=predicates_list)
 
             vidFile = cv2.VideoCapture(imgs_filename+"/"+img_files[i])
             anns = get_annotation(anns_filename+"/"+img_files[i][:-4]+".xml")
@@ -198,6 +208,7 @@ def main():
 
         
         if event == "-LISTBOXAnn-":
+            window.Element('-predicateList-').update(value='', values=predicates_list)
             j=ann_pairs_list.index(response["-LISTBOXAnn-"][0])
             imgbytes = img(frame,window,ann_pairs,anns,j,df)
 
@@ -208,7 +219,9 @@ def main():
 
 
         if(event=="Next Ann") and j!=len(ann_pairs):
+            # print(response["-predicateList-"])
             window.Element('-LISTBOXAnn-').Update(set_to_index=j) 
+            window.Element('-predicateList-').update(value='', values=predicates_list)
 
 
             imgbytes = img(frame,window,ann_pairs,anns,j,df)
