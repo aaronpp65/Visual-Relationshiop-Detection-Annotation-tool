@@ -116,13 +116,13 @@ def main():
     predicates_list.sort()
 
 
-    block_1 = [[sg.Image(filename='', key='image')], [sg.Text(size=(10,1), key='-subject-'),sg.Text(size=(10,1), key='-predicate-'),sg.Text(size=(10,1), key='-object-')],
-                [sg.Text('Predicate :'), sg.Combo(predicates_list, size=(12,20), key='-predicateList-')],[ nextAnnBtn()],[ nextBtn()]]
+    block_1 = [[sg.Image(filename='', key='image')], [sg.Text(size=(10,1), key='-subject-',font='Any 20'),sg.Text(size=(10,1), key='-predicate-',font='Any 20'),sg.Text(size=(10,1), key='-object-',font='Any 20')],
+                [sg.Text('Predicate :',font='Any 20'), sg.Combo(predicates_list, size=(22,30), key='-predicateList-')],[ nextAnnBtn()],[ nextBtn()]]
 
-    block_2 = [[sg.Text('Images', font='Any 20')],
+    block_3 = [[sg.Text('Images', font='Any 20')],
             [sg.Listbox(img_files, size=(20, 30),default_values=[img_files[0],], bind_return_key=True, key='-LISTBOXImg-')]]
 
-    block_3 = [[sg.Text('Ann Pairs', font='Any 20')],
+    block_2 = [[sg.Text('Relationships', font='Any 20')],
             [sg.Listbox([], size=(30, 30), bind_return_key=True, key='-LISTBOXAnn-')]]
 
     layout = [[sg.Column(block_1),sg.Column(block_2),sg.Column(block_3)]]
@@ -159,8 +159,19 @@ def main():
 
             i+=1
             ret, frame = vidFile.read()
+            #
+            anns_keys=[]
+            for key, value in anns.items():
+                anns_keys.append(key)
 
-            ann_pairs = (list(itertools.combinations(anns.keys(), 2)))
+            ann_pairs=[]
+            for k in range(0,len(anns)):
+                for l in range(0,len(anns)):
+                    if(k!=l):
+                        ann_pairs.append((anns_keys[k],anns_keys[l]))
+            #
+
+            # ann_pairs = (list(itertools.combinations(anns.keys(), 2)))
             ann_pairs_list=[]
             ann_pairs_list=get_list(ann_pairs,anns,df)
             window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
@@ -195,8 +206,18 @@ def main():
 
             i+=1
             ret, frame = vidFile.read()
+            #
+            anns_keys=[]
+            for key, value in anns.items():
+                anns_keys.append(key)
 
-            ann_pairs = (list(itertools.combinations(anns.keys(), 2)))
+            ann_pairs=[]
+            for k in range(0,len(anns)):
+                for l in range(0,len(anns)):
+                    if(k!=l):
+                        ann_pairs.append((anns_keys[k],anns_keys[l]))
+            #
+            # ann_pairs = (list(itertools.combinations(anns.keys(), 2)))
             ann_pairs_list=[]
             ann_pairs_list=get_list(ann_pairs,anns,df)
             window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
