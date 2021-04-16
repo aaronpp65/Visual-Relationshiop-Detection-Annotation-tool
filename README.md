@@ -23,7 +23,7 @@ This tool is used on a dataset already annotated in the VOC format. MAke sure th
 
 ### Navigation
 
-![alt text](https://github.com/[aaronpp65]/[Visual-Relationshiop-Detection-Annotation-tool]/blob/[master]/images/Screenshot1.png?raw=true)
+![screenshot](https://github.com/aaronpp65/Visual-Relationshiop-Detection-Annotation-tool/blob/master/images/Screenshot1.png?raw=true)
 
 Choose the predicate from dropdown list and select Next Ann to save the entry.
 
