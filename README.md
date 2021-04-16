@@ -45,7 +45,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 * **Aaron P P** - *Initial work* - [aaronpp65](https://github.com/aaronpp65)
 
 
-See also the list of [contributors](https://github.com/aaronpp65/face-recognition-vggface2/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/aaronpp65/Visual-Relationshiop-Detection-Annotation-tool/contributors) who participated in this project.
 
 ## License
 
@@ -53,6 +53,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* [VGGFace2: A dataset for recognising faces across pose and age](https://arxiv.org/abs/1710.08092)
+* [PySimpleGUI: Python GUIs for Humans](https://github.com/PySimpleGUI/)
 
 
