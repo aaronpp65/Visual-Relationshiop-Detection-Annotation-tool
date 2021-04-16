@@ -1,5 +1,0 @@
-subject,subjectAnn,predicate,object,objectAnn
-person14,"[325, 103, 636, 433]",behind,person24,"[1027, 176, 1302, 442]"
-person14,"[325, 103, 636, 433]",holding,person34,"[738, 590, 1007, 883]"
-person24,"[1027, 176, 1302, 442]",has,person34,"[738, 590, 1007, 883]"
-person24,"[1027, 176, 1302, 442]",holding,person34,"[738, 590, 1007, 883]"

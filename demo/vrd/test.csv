@@ -1,5 +1,0 @@
-subject,subjectAnn,predicate,object,objectAnn
-person1,"[233, 70, 601, 403]",yoyo,person4,"[976, 554, 1315, 819]"
-person1,"[233, 70, 601, 403]",bb,person2,"[968, 158, 1265, 414]"
-person3,"[251, 524, 666, 813]",abcd,person4,"[976, 554, 1315, 819]"
-person2,"[968, 158, 1265, 414]",holding,person1,"[233, 70, 601, 403]"

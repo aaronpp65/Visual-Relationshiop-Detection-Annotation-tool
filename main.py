@@ -167,7 +167,7 @@ def main():
             ann_pairs=[]
             for k in range(0,len(anns)):
                 for l in range(0,len(anns)):
-                    if(k!=l):
+                    if(k!=l and anns[anns_keys[l]]=="aeroplane"):
                         ann_pairs.append((anns_keys[k],anns_keys[l]))
             #
 
@@ -214,7 +214,7 @@ def main():
             ann_pairs=[]
             for k in range(0,len(anns)):
                 for l in range(0,len(anns)):
-                    if(k!=l):
+                    if(k!=l and anns[anns_keys[l]]=="aeroplane"):
                         ann_pairs.append((anns_keys[k],anns_keys[l]))
             #
             # ann_pairs = (list(itertools.combinations(anns.keys(), 2)))
