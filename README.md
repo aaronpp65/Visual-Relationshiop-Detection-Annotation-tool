@@ -1,6 +1,6 @@
 # Visual Relationship Detection Annotation tool
 
-This is a tool for annotating the ```subject-predicate-object``` relationships in an imgae.
+This is a tool for annotating the ```subject-predicate-object``` relationships in an image.
 
 ## Getting Started
 
