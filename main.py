@@ -101,7 +101,7 @@ def update_predicate(df,anns,ann_pairs,window,j):
 
 def main():
 
-    filename = sg.popup_get_folder('Filename with Imgs and Anns')
+    filename = sg.popup_get_folder('Browse')
     if filename is None:
         return
     imgs_filename = filename+'/JPEGImages'
