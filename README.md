@@ -7,7 +7,7 @@ This is a tool for annotating the ```subject-predicate-object``` relationships i
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ```
-git clone https://github.com/aaronpp65/face-recognition-vggface2.git
+git clone https://github.com/aaronpp65/Visual-Relationshiop-Detection-Annotation-tool.git
 ```
 
 ### Prerequisites
@@ -23,7 +23,7 @@ This tool is used on a dataset already annotated in the VOC format. MAke sure th
 
 ### Navigation
 
-![alt text](https://github.com/[username]/[reponame]/blob/[branch]/images/Screenshot1.png?raw=true)
+![alt text](https://github.com/[aaronpp65]/[Visual-Relationshiop-Detection-Annotation-tool]/blob/[master]/images/Screenshot1.png?raw=true)
 
 Choose the predicate from dropdown list and select Next Ann to save the entry.
 
