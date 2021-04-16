@@ -39,6 +39,9 @@ python main.py
 
 Choose the predicate from dropdown list and select Next Ann to save the entry.
 
+### Navigation
+
+Update the list of predicates in ```predicates.txt```
 
 ## Contributing
 
