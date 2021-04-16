@@ -19,7 +19,15 @@ pip install pysimplegui
 ```
 ## Usage
 
-This tool is used on a dataset already annotated in the VOC format. MAke sure the folder structure is same.
+This tool is used on a dataset already annotated in the VOC format. Make sure the folder structure is same.
+ 
+    ├── ...
+    ├── dataset                   
+    │   ├── Annotations          
+    │   ├── JPEGImages 
+    │   ├── ImageSets         
+    │   └── VRD                
+    └── ...
 
 ### Navigation
 
