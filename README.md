@@ -29,6 +29,10 @@ This tool is used on a dataset already annotated in the VOC format. Make sure th
     │   └── VRD                
     └── ...
 
+```
+python main.py
+```
+
 ### Navigation
 
 ![screenshot](https://github.com/aaronpp65/Visual-Relationshiop-Detection-Annotation-tool/blob/master/images/Screenshot1.png?raw=true)
