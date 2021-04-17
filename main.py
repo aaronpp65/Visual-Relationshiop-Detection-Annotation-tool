@@ -71,8 +71,8 @@ def img(frame,window,ann_pairs,anns,j,df):
 def write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j):
         predicate = response["-predicateList-"]
         if(predicate):
-            subject = df[(df["subject"] == anns[ann_pairs[j-1][0]]) ]
-            object = subject.loc[subject["object"] ==anns[ann_pairs[j-1][1]], "predicate"]
+            subject = df[(df["subjectAnn"] == ann_pairs[j-1][0]) ]
+            object = subject.loc[subject["objectAnn"] ==ann_pairs[j-1][1], "predicate"]
             try:
                 df.loc[object.index[0],'predicate']=predicate
                 df.to_csv(vrd_filename+"/"+img_files[i-1][:-4]+".csv", index=False)
@@ -82,8 +82,8 @@ def write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j):
 def get_list(ann_pairs,anns,df):
     ann_pairs_list=[]
     for ann_pair in ann_pairs:
-        subject = df[(df["subject"] == anns[ann_pair[0]]) ]
-        object = subject.loc[subject["object"] ==anns[ann_pair[1]], "predicate"]
+        subject = df[(df["subjectAnn"] == ann_pair[0]) ]
+        object = subject.loc[subject["objectAnn"] == ann_pair[1], "predicate"]
         try:
             ann_pairs_list.append(anns[ann_pair[0]]+"   "+object.values[0]+"    "+anns[ann_pair[1]])
         except:
@@ -92,8 +92,8 @@ def get_list(ann_pairs,anns,df):
         
 
 def update_predicate(df,anns,ann_pairs,window,j):
-    subject = df[(df["subject"] == anns[ann_pairs[j][0]]) ]
-    object = subject.loc[subject["object"] ==anns[ann_pairs[j][1]], "predicate"]
+    subject = df[(df["subjectAnn"] == ann_pairs[j][0]) ]
+    object = subject.loc[subject["objectAnn"] ==ann_pairs[j][1], "predicate"]
     try:
         window['-predicate-'].update(object.values[0])
     except:
@@ -101,7 +101,9 @@ def update_predicate(df,anns,ann_pairs,window,j):
 
 def main():
 
-    filename = sg.popup_get_folder('Filename with Imgs and Anns')
+    # filename = sg.popup_get_folder('Filename with Imgs and Anns')
+    filename = "/home/phi/code/Neuroplex/vrd_gui/demo/airport-data"
+    print(filename)
     if filename is None:
         return
     imgs_filename = filename+'/JPEGImages'
@@ -230,7 +232,9 @@ def main():
         
         if event == "-LISTBOXAnn-":
             window.Element('-predicateList-').update(value='', values=predicates_list)
-            j=ann_pairs_list.index(response["-LISTBOXAnn-"][0])
+            # j=ann_pairs_list.index(response["-LISTBOXAnn-"][0])
+            j=window[event].GetIndexes()[0]
+            print(window[event].GetIndexes()[0])
             imgbytes = img(frame,window,ann_pairs,anns,j,df)
 
             update_predicate(df,anns,ann_pairs,window,j)
@@ -240,8 +244,13 @@ def main():
 
 
         if(event=="Next Ann") and j!=len(ann_pairs):
-            # print(response["-predicateList-"])
-            window.Element('-LISTBOXAnn-').Update(set_to_index=j) 
+            #updating the list in window
+            ann_pairs_list=[]
+            ann_pairs_list=get_list(ann_pairs,anns,df)
+            window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
+            # updating the selected relationship
+            window.Element('-LISTBOXAnn-').Update(set_to_index=j)
+            # reseting the  predciates dropdown
             window.Element('-predicateList-').update(value='', values=predicates_list)
 
 
@@ -250,6 +259,7 @@ def main():
             update_predicate(df,anns,ann_pairs,window,j)
 
             write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j)
+            # window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
             j+=1
             
         if(j==len(ann_pairs)):
