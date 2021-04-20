@@ -262,7 +262,7 @@ def main():
             # window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
             j+=1
             
-        if(j==len(ann_pairs)):
+        elif(j==len(ann_pairs)):
             write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j)
             j=0
 
