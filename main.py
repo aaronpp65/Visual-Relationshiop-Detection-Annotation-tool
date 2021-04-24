@@ -13,22 +13,14 @@ import json
 import itertools
 
 
+
 def nextBtn():
-    return sg.Button("Next Image")
+    return sg.Button("Next Image",size=(10,3))
 
-def submitBtn():
-    return sg.Button("Submit")
-
-
-def prevBtn():
-    return sg.Button("Previous")
     
 def nextAnnBtn():
-    return sg.Button("Next Ann")
+    return sg.Button("Next Ann",size=(7,2))
 
-
-def prevAnnBtn():
-    return sg.Button("Previous Ann")
 
 def get_annotation(ann_path):
 
@@ -118,7 +110,7 @@ def main():
     predicates_list.sort()
 
 
-    block_1 = [[sg.Image(filename='', key='image')], [sg.Text(size=(10,1), key='-subject-',font='Any 20'),sg.Text(size=(10,1), key='-predicate-',font='Any 20'),sg.Text(size=(10,1), key='-object-',font='Any 20')],
+    block_1 = [[sg.Image(filename='', key='image')], [sg.Text(size=(10,1), key='-subject-',font='Any 20'),sg.Text(size=(10,1), key='-predicate-',font='Any 20', text_color='#66CDAA'),sg.Text(size=(10,1), key='-object-',font='Any 20')],
                 [sg.Text('Predicate :',font='Any 20'), sg.Combo(predicates_list, size=(22,30), key='-predicateList-')],[ nextAnnBtn()],[ nextBtn()]]
 
     block_3 = [[sg.Text('Images', font='Any 20')],
@@ -244,12 +236,11 @@ def main():
 
 
         if(event=="Next Ann") and j!=len(ann_pairs):
-            #updating the list in window
-            ann_pairs_list=[]
-            ann_pairs_list=get_list(ann_pairs,anns,df)
-            window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
-            # updating the selected relationship
-            window.Element('-LISTBOXAnn-').Update(set_to_index=j)
+            # #updating the list in window
+            # ann_pairs_list=[]
+            # ann_pairs_list=get_list(ann_pairs,anns,df)
+            # window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
+
             # reseting the  predciates dropdown
             window.Element('-predicateList-').update(value='', values=predicates_list)
 
@@ -259,12 +250,33 @@ def main():
             update_predicate(df,anns,ann_pairs,window,j)
 
             write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j)
-            # window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
+            #updating the list in window
+            ann_pairs_list=[]
+            ann_pairs_list=get_list(ann_pairs,anns,df)
+            window.Element('-LISTBOXAnn-').Update(ann_pairs_list)  
+            # updating the selected relationship
+            window.Element('-LISTBOXAnn-').Update(set_to_index=j)          
             j+=1
             
         elif(j==len(ann_pairs)):
             write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j)
+            #updating the list in window
+            ann_pairs_list=[]
+            ann_pairs_list=get_list(ann_pairs,anns,df)
+            window.Element('-LISTBOXAnn-').Update(ann_pairs_list)  
+            # updating the selected relationship
+            window.Element('-LISTBOXAnn-').Update(set_to_index=j) 
             j=0
+    
+        # if(event=="Submit"):
+        #     write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j)
+        #     # reseting the  predciates dropdown
+        #     window.Element('-predicateList-').update(value='', values=predicates_list)
+        #     #updating the list in window
+        #     ann_pairs_list=[]
+        #     ann_pairs_list=get_list(ann_pairs,anns,df)
+        #     window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
+
 
         window['image'](data=imgbytes)
 
