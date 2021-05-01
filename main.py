@@ -12,7 +12,7 @@ import os
 import json
 import itertools
 
-
+# todo : change writer to df
 
 def nextBtn():
     return sg.Button("Next Image",size=(10,3))
@@ -69,7 +69,11 @@ def write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j):
                 df.loc[object.index[0],'predicate']=predicate
                 df.to_csv(vrd_filename+"/"+img_files[i-1][:-4]+".csv", index=False)
             except:
-                writer.writerow([anns[ann_pairs[j-1][0]],ann_pairs[j-1][0], predicate, anns[ann_pairs[j-1][1]], ann_pairs[j-1][1]])
+                # writer.writerow([anns[ann_pairs[j-1][0]],ann_pairs[j-1][0], predicate, anns[ann_pairs[j-1][1]], ann_pairs[j-1][1]])
+                df.loc[len(df.index)] = [anns[ann_pairs[j-1][0]],ann_pairs[j-1][0], predicate, anns[ann_pairs[j-1][1]], ann_pairs[j-1][1]] 
+                df.to_csv(vrd_filename+"/"+img_files[i-1][:-4]+".csv", index=False)
+
+
 
 def get_list(ann_pairs,anns,df):
     ann_pairs_list=[]
@@ -250,6 +254,7 @@ def main():
             update_predicate(df,anns,ann_pairs,window,j)
 
             write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j)
+            print(ann_pairs,anns)
             #updating the list in window
             ann_pairs_list=[]
             ann_pairs_list=get_list(ann_pairs,anns,df)
