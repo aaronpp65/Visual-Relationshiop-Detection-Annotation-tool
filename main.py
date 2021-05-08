@@ -127,6 +127,11 @@ def main():
 
     window = sg.Window('VRD Application ', layout, location=(800, 400),resizable=True)
 
+    with open(os.path.join('default_relationships.json'), 'r') as f:
+            default_dict = json.load(f)
+
+    # default_dict = {'bridge_connected':'conneced'}
+
     i=0
     while window(timeout=20)[0] is not None:
         response = {}
@@ -167,6 +172,11 @@ def main():
                 for l in range(0,len(anns)):
                     if(k!=l and anns[anns_keys[l]]=="aeroplane"):
                         ann_pairs.append((anns_keys[k],anns_keys[l]))
+                                                # .......#
+                        if(anns[anns_keys[k]] in default_dict.keys()):
+                            df.loc[len(df.index)] = [anns[anns_keys[k]],anns_keys[k], default_dict[anns[anns_keys[k]]], anns[anns_keys[l]], anns_keys[l]] 
+                            df.to_csv(vrd_filename+"/"+img_files[i-1][:-4]+".csv", index=False)
+                        # .......#
             #
 
             # ann_pairs = (list(itertools.combinations(anns.keys(), 2)))
@@ -214,6 +224,14 @@ def main():
                 for l in range(0,len(anns)):
                     if(k!=l and anns[anns_keys[l]]=="aeroplane"):
                         ann_pairs.append((anns_keys[k],anns_keys[l]))
+                        # .......#
+                        if(anns[anns_keys[k]] in default_dict.keys()):
+                            df.loc[len(df.index)] = [anns[anns_keys[k]],anns_keys[k], default_dict[anns[anns_keys[k]]], anns[anns_keys[l]], anns_keys[l]] 
+                            df.to_csv(vrd_filename+"/"+img_files[i-1][:-4]+".csv", index=False)
+                        # .......#
+                        
+
+
             #
             # ann_pairs = (list(itertools.combinations(anns.keys(), 2)))
             ann_pairs_list=[]
@@ -254,7 +272,7 @@ def main():
             update_predicate(df,anns,ann_pairs,window,j)
 
             write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j)
-            print(ann_pairs,anns)
+            # print(ann_pairs,anns)
             #updating the list in window
             ann_pairs_list=[]
             ann_pairs_list=get_list(ann_pairs,anns,df)
