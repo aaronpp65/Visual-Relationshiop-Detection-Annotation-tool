@@ -81,9 +81,11 @@ def get_list(ann_pairs,anns,df,default_dict):
         subject = df[(df["subjectAnn"] == ann_pair[0]) ]
         object = subject.loc[subject["objectAnn"] == ann_pair[1], "predicate"]
         try:
-            if(object.values[0] not in default_dict.values()):
-                print(object.values[0],default_dict.values())
-                ann_pairs_list.append(anns[ann_pair[0]]+"   "+object.values[0]+"    "+anns[ann_pair[1]])
+            # if(object.values[0] not in default_dict.values()):
+            #     print(object.values[0],default_dict.values())
+            ann_pairs_list.append(anns[ann_pair[0]]+"   "+object.values[0]+"    "+anns[ann_pair[1]])
+            # else:
+            #     ann_pairs_list.append("default")
         except:
             ann_pairs_list.append(anns[ann_pair[0]]+"   nil   "+anns[ann_pair[1]])
     return ann_pairs_list
@@ -249,10 +251,16 @@ def main():
 
         
         if event == "-LISTBOXAnn-":
-            window.Element('-predicateList-').update(value='', values=predicates_list)
             # j=ann_pairs_list.index(response["-LISTBOXAnn-"][0])
             j=window[event].GetIndexes()[0]
-            print(window[event].GetIndexes()[0])
+            print(anns)
+            print(anns[ann_pairs[j][0]])
+            if(anns[ann_pairs[j][0]]=='bridge_connected'):
+                window.Element('-predicateList-').update(value='', values=[])
+            else:
+                window.Element('-predicateList-').update(value='', values=predicates_list)
+
+
             imgbytes = img(frame,window,ann_pairs,anns,j,df)
 
             update_predicate(df,anns,ann_pairs,window,j)
@@ -268,9 +276,12 @@ def main():
             # window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
 
             # reseting the  predciates dropdown
-            window.Element('-predicateList-').update(value='', values=predicates_list)
+            # window.Element('-predicateList-').update(value='', values=predicates_list)
 
-
+            if(anns[ann_pairs[j][0]]=='bridge_connected'):
+                window.Element('-predicateList-').update(value='', values=[])
+            else:
+                window.Element('-predicateList-').update(value='', values=predicates_list)
             imgbytes = img(frame,window,ann_pairs,anns,j,df)
 
             update_predicate(df,anns,ann_pairs,window,j)
@@ -279,7 +290,7 @@ def main():
             # print(ann_pairs,anns)
             #updating the list in window
             ann_pairs_list=[]
-            ann_pairs_list=get_list(ann_pairs,anns,df)
+            ann_pairs_list=get_list(ann_pairs,anns,df,default_dict)
             window.Element('-LISTBOXAnn-').Update(ann_pairs_list)  
             # updating the selected relationship
             window.Element('-LISTBOXAnn-').Update(set_to_index=j)          
@@ -289,7 +300,7 @@ def main():
             write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j)
             #updating the list in window
             ann_pairs_list=[]
-            ann_pairs_list=get_list(ann_pairs,anns,df)
+            ann_pairs_list=get_list(ann_pairs,anns,df,default_dict)
             window.Element('-LISTBOXAnn-').Update(ann_pairs_list)  
             # updating the selected relationship
             window.Element('-LISTBOXAnn-').Update(set_to_index=j) 
