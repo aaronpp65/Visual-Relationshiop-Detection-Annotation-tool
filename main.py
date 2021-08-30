@@ -75,13 +75,15 @@ def write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j):
 
 
 
-def get_list(ann_pairs,anns,df):
+def get_list(ann_pairs,anns,df,default_dict):
     ann_pairs_list=[]
     for ann_pair in ann_pairs:
         subject = df[(df["subjectAnn"] == ann_pair[0]) ]
         object = subject.loc[subject["objectAnn"] == ann_pair[1], "predicate"]
         try:
-            ann_pairs_list.append(anns[ann_pair[0]]+"   "+object.values[0]+"    "+anns[ann_pair[1]])
+            if(object.values[0] not in default_dict.values()):
+                print(object.values[0],default_dict.values())
+                ann_pairs_list.append(anns[ann_pair[0]]+"   "+object.values[0]+"    "+anns[ann_pair[1]])
         except:
             ann_pairs_list.append(anns[ann_pair[0]]+"   nil   "+anns[ann_pair[1]])
     return ann_pairs_list
@@ -172,16 +174,17 @@ def main():
                 for l in range(0,len(anns)):
                     if(k!=l and anns[anns_keys[l]]=="aeroplane"):
                         ann_pairs.append((anns_keys[k],anns_keys[l]))
-                                                # .......#
-                        if(anns[anns_keys[k]] in default_dict.keys()):
-                            df.loc[len(df.index)] = [anns[anns_keys[k]],anns_keys[k], default_dict[anns[anns_keys[k]]], anns[anns_keys[l]], anns_keys[l]] 
-                            df.to_csv(vrd_filename+"/"+img_files[i-1][:-4]+".csv", index=False)
+                        # .......#
+                        if(default_dict):
+                            if(anns[anns_keys[k]] in default_dict.keys()):
+                                df.loc[len(df.index)] = [anns[anns_keys[k]],anns_keys[k], default_dict[anns[anns_keys[k]]], anns[anns_keys[l]], anns_keys[l]] 
+                                df.to_csv(vrd_filename+"/"+img_files[i-1][:-4]+".csv", index=False)
                         # .......#
             #
 
             # ann_pairs = (list(itertools.combinations(anns.keys(), 2)))
             ann_pairs_list=[]
-            ann_pairs_list=get_list(ann_pairs,anns,df)
+            ann_pairs_list=get_list(ann_pairs,anns,df,default_dict)
             window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
 
             imgbytes = img(frame,window,ann_pairs,anns,j,df)
@@ -225,9 +228,10 @@ def main():
                     if(k!=l and anns[anns_keys[l]]=="aeroplane"):
                         ann_pairs.append((anns_keys[k],anns_keys[l]))
                         # .......#
-                        if(anns[anns_keys[k]] in default_dict.keys()):
-                            df.loc[len(df.index)] = [anns[anns_keys[k]],anns_keys[k], default_dict[anns[anns_keys[k]]], anns[anns_keys[l]], anns_keys[l]] 
-                            df.to_csv(vrd_filename+"/"+img_files[i-1][:-4]+".csv", index=False)
+                        if(default_dict):
+                            if(anns[anns_keys[k]] in default_dict.keys()):
+                                df.loc[len(df.index)] = [anns[anns_keys[k]],anns_keys[k], default_dict[anns[anns_keys[k]]], anns[anns_keys[l]], anns_keys[l]] 
+                                df.to_csv(vrd_filename+"/"+img_files[i-1][:-4]+".csv", index=False)
                         # .......#
                         
 
@@ -235,7 +239,7 @@ def main():
             #
             # ann_pairs = (list(itertools.combinations(anns.keys(), 2)))
             ann_pairs_list=[]
-            ann_pairs_list=get_list(ann_pairs,anns,df)
+            ann_pairs_list=get_list(ann_pairs,anns,df,default_dict)
             window.Element('-LISTBOXAnn-').Update(ann_pairs_list)
 
             update_predicate(df,anns,ann_pairs,window,j)
