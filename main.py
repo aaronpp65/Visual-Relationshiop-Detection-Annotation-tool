@@ -209,6 +209,7 @@ def main():
             if(os.path.isfile(vrd_filename+"/"+img_files[i][:-4]+".csv")) :
                 file = open(vrd_filename+"/"+img_files[i][:-4]+".csv", 'a')
                 writer = csv.writer(file)
+                flagNextImage=0
             else:
                 file = open(vrd_filename+"/"+img_files[i][:-4]+".csv", 'w')
                 writer = csv.writer(file)
@@ -216,7 +217,7 @@ def main():
                 file.close()
                 file = open(vrd_filename+"/"+img_files[i][:-4]+".csv", 'a')
                 writer = csv.writer(file)
-
+                flagNextImage=1
             df = pd.read_csv(vrd_filename+"/"+img_files[i][:-4]+".csv")
 
             i+=1
@@ -232,7 +233,7 @@ def main():
                     if(k!=l and anns[anns_keys[l]]=="aeroplane"):
                         ann_pairs.append((anns_keys[k],anns_keys[l]))
                         # .......#
-                        if(default_dict):
+                        if(default_dict and flagNextImage):
                             if(anns[anns_keys[k]] in default_dict.keys()):
                                 df.loc[len(df.index)] = [anns[anns_keys[k]],anns_keys[k], default_dict[anns[anns_keys[k]]], anns[anns_keys[l]], anns_keys[l]] 
                                 df.to_csv(vrd_filename+"/"+img_files[i-1][:-4]+".csv", index=False)
@@ -254,20 +255,23 @@ def main():
         
         if event == "-LISTBOXAnn-":
             # j=ann_pairs_list.index(response["-LISTBOXAnn-"][0])
-            j=window[event].GetIndexes()[0]
-            print(anns)
-            print(anns[ann_pairs[j][0]])
-            if(anns[ann_pairs[j][0]]=='bridge_connected'):
-                window.Element('-predicateList-').update(value='', values=[])
-            else:
-                window.Element('-predicateList-').update(value='', values=predicates_list)
+            try:
+                j=window[event].GetIndexes()[0]
+                # print(anns)
+                # print(anns[ann_pairs[j][0]])
+                if(anns[ann_pairs[j][0]]=='bridge_connected'):
+                    window.Element('-predicateList-').update(value='', values=[])
+                else:
+                    window.Element('-predicateList-').update(value='', values=predicates_list)
 
-            imgbytes = img(frame,window,ann_pairs,anns,j,df)
+                imgbytes = img(frame,window,ann_pairs,anns,j,df)
 
-            update_predicate(df,anns,ann_pairs,window,j)
-            
-            write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j)
-            j+=1
+                update_predicate(df,anns,ann_pairs,window,j)
+                
+                write_csv(response,df,anns,ann_pairs,vrd_filename,img_files,i,writer,j)
+                j+=1
+            except:
+                print("error")
 
 
         if(event=="Next Ann") and j!=len(ann_pairs):
