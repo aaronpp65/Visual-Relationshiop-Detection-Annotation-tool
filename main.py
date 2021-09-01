@@ -259,7 +259,7 @@ def main():
                 j=window[event].GetIndexes()[0]
                 # print(anns)
                 # print(anns[ann_pairs[j][0]])
-                if(anns[ann_pairs[j][0]]=='bridge_connected'):
+                if(anns[ann_pairs[j][0]] in default_dict.keys()):
                     window.Element('-predicateList-').update(value='', values=[])
                 else:
                     window.Element('-predicateList-').update(value='', values=predicates_list)
@@ -283,7 +283,7 @@ def main():
             # reseting the  predciates dropdown
             # window.Element('-predicateList-').update(value='', values=predicates_list)
 
-            if(anns[ann_pairs[j][0]]=='bridge_connected'):
+            if(anns[ann_pairs[j][0]] in default_dict.keys()):
                 window.Element('-predicateList-').update(value='', values=[])
             else:
                 window.Element('-predicateList-').update(value='', values=predicates_list)
