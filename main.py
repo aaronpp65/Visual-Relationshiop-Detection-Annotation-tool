@@ -111,6 +111,7 @@ def main():
     vrd_filename = filename+'/vrd'
     
     img_files = os.listdir(imgs_filename)
+    img_files.sort()
 
     predicatesfile = open("/home/phi/code/Neuroplex/vrd_gui/predicates.txt", 'r')
     predicates_list = [line.rstrip() for line in predicatesfile.readlines()]
